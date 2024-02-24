@@ -1,0 +1,41 @@
+.container-cart{
+    width: 1200px;
+    padding: 0px;
+    margin: 0px auto;
+    display: flex;
+    gap: 20px;
+}
+
+.tit-cart{
+    padding: 10px;
+    background-color: rgb(241, 241, 241);
+}
+
+.tit-left{
+    width: 60%;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.tit-right{
+    width: 40%;
+}
+
+.cart-product{
+    display: flex;
+    gap: 20px;
+    width: 720px;
+}
+
+.w-m{
+    width: 400px;
+}
+
+.thanhtoangio{
+    background-color: black;
+    color: white;
+    width: 460px;
+    padding: 10px;
+    margin-top: 50px;
+    border-radius: 100px;
+}
