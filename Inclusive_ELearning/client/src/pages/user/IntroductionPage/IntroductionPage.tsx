@@ -730,7 +730,7 @@ const IntroductionPage = () => {
     const renderedSimilarProducts = shuffledSimilarProducts.slice(0, 7).map((similarProduct: any) => (
         <li key={similarProduct.id} className="prosimi flex items-start gap-4 px-4 py-3">
             <div className="flex items-center shrink-0">
-                <img src={similarProduct.courseIMG} alt="product image" className="w-32 rounded" />
+                <img src={similarProduct.courseIMG[0]} alt="product image" className="w-20 h-20 rounded" />
             </div>
             <div className="flex flex-col gap-0 min-h-[2rem] items-start justify-center w-full min-w-0">
                 <h4 className='text-xs'>New</h4>
@@ -794,13 +794,13 @@ const IntroductionPage = () => {
                                     onCancel={() => setIsModalVisible(false)}
                                 >
                                     <p>Màu sắc:</p>
-                                    <Select value={selectedColor} onChange={value => setSelectedColor(value)}>
+                                    <Select className='w-20' value={selectedColor} onChange={value => setSelectedColor(value)}>
                                         {colors.map(color => (
                                             <Option key={color} value={color}>{color}</Option>
                                         ))}
                                     </Select>
                                     <p>Kích cỡ:</p>
-                                    <Select value={selectedSize} onChange={value => setSelectedSize(value)}>
+                                    <Select className='w-20' value={selectedSize} onChange={value => setSelectedSize(value)}>
                                         {sizes.map(size => (
                                             <Option key={size.id} value={size.value}>{size.label}</Option>
                                         ))}

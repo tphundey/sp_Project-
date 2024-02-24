@@ -68,4 +68,14 @@ routerPayments.delete("/:id", async (req, res) => {
   }
 });
 
+routerPayments.delete("/", async (req, res) => {
+  try {
+    await Payment.deleteMany({});
+    return res.status(204).json();
+  } catch (error) {
+    return res.status(500).json({ error: "Could not delete courses" });
+  }
+});
+
+
 module.exports = routerPayments;

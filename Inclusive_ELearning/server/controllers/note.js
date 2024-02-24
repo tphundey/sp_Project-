@@ -66,6 +66,13 @@ routerNotes.delete("/:id", async (req, res) => {
     return res.status(500).json({ error: "Could not delete course" });
   }
 });
-
+routerNotes.delete("/", async (req, res) => {
+  try {
+    await Notes.deleteMany({});
+    return res.status(204).json();
+  } catch (error) {
+    return res.status(500).json({ error: "Could not delete courses" });
+  }
+});
 
 module.exports = routerNotes;

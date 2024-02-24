@@ -147,7 +147,7 @@ const Homepage: React.FC = () => {
                                                 return (
                                                     <div className="group relative">
                                                         <div className="aspect-h-1 pro product-hp w-full h-full rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80 product-slide">
-                                                            <img src={product.courseIMG} alt="" />
+                                                            <img src={product.courseIMG[0]} alt="" />
                                                         </div>
                                                         <div className="mt-2">
                                                             <div>
@@ -189,7 +189,7 @@ const Homepage: React.FC = () => {
                                                 return (
                                                     <div className="group relative">
                                                         <div className="aspect-h-1 pro product-hp w-full h-full rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80 product-slide">
-                                                            <img src={product.courseIMG} alt="" />
+                                                            <img src={product.courseIMG[0]} alt="" />
                                                         </div>
                                                         <div className="mt-2">
                                                             <div>

@@ -15,7 +15,7 @@ const AdminProduct = () => {
     const [, setShowFullDescription] = useState(false);
     const [selectedCourseVideos, setSelectedCourseVideos] = useState([]);
     const [isVideosModalVisible, setIsVideosModalVisible] = useState(false);
-    const pageSize = 4;
+    const pageSize = 3;
     const [searchTerm, setSearchTerm] = useState("");
     const showFullDescription = (courseID: any) => {
         const selectedCourse = productsData.find((product: any) => product.id === courseID);
@@ -201,7 +201,7 @@ const AdminProduct = () => {
                 return (
                     <>
                         <Popconfirm
-                            title={isHidden ? 'Bỏ ẩn khóa học?' : 'Ẩn khóa học?'}
+                            title={isHidden ? 'Bỏ ẩn sản phẩm?' : 'Ẩn sản phẩm?'}
                             onConfirm={() => updateHiddenState(record.id, !isHidden)}
                         >
                             <Button type={isHidden ? 'dashed' : 'default'} className={hiddenButtonClass}>
@@ -392,7 +392,7 @@ const AdminProduct = () => {
     return (
         <div>
             <Modal
-                title={`Danh sách video của khóa học !`}
+                title={`Danh sách người mua sản phẩm !`}
                 visible={isVideosModalVisible}
                 onOk={() => setIsVideosModalVisible(false)}
                 onCancel={() => setIsVideosModalVisible(false)}
@@ -456,11 +456,11 @@ const AdminProduct = () => {
             </header>
             {contextHolder}
             <Input.Search
-                placeholder="tìm kiếm theo tên sản phẩm"
+                placeholder="Tìm kiếm theo tên sản phẩm"
                 onSearch={handleSearch}
                 style={{ width: 250, marginBottom: 20, marginRight: 10 }}
             />
-            <Button onClick={handleResetSearch}>tạo lại tìm kiếm</Button>
+            <Button onClick={handleResetSearch}>Tạo lại tìm kiếm</Button>
 
             {isProductLoading ? (
                 <Skeleton />

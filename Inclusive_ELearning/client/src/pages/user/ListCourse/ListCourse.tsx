@@ -134,7 +134,7 @@ const ListCourse = () => {
                         <div className='ty-contai'>
                             <div className="courseProgress">
                                 <div className="imgCoureProgress">
-                                    <img src={course.courseIMG} alt="" />
+                                    <img src={course.courseIMG[0]} alt="" />
                                 </div>
                                 <div className="infoCourseProgress">
                                     <h3 style={{ borderRadius: 50 }} className='bg-red-500 text-white w-9 p-1 '>New</h3>

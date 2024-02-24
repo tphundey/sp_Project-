@@ -25,12 +25,12 @@ const initialValues: any = {
 };
 
 const AdminProductAdd = () => {
-    const chatLieuOptions = ["Option 1", "Option 2", "Option 3"];
+    const chatLieuOptions = ["Carbon", "Cartoon"];
     const handleColorChange = (value: string[]) => {
         setColors(value);
     };
     const [uploadedFileUrls, setUploadedFileUrls] = useState<string[]>([]);
-    const mauSacOptions = ["Red", "Blue", "Green", "Yellow", "Black", "White"];
+    const mauSacOptions = ["Red", "Blue", "Green", "Yellow", "Black", "White","Gray"];
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [uploadedFileUrl, setUploadedFileUrl] = useState('');
@@ -93,7 +93,7 @@ const AdminProductAdd = () => {
             .then(() => {
                 messageApi.open({
                     type: "success",
-                    content: "Bạn đã thêm khóa học mới thành công. Chờ 3s để quay về quản trị",
+                    content: "Bạn đã thêm sản phẩm mới thành công. Chờ 3s để quay về quản trị",
                 });
                 form.resetFields();
                 setUploadedFileUrl('');
@@ -228,7 +228,7 @@ const AdminProductAdd = () => {
 
 
                 <Form.Item
-                    label="Mô tả khóa học"
+                    label="Mô tả sản phẩm"
                     name="description"
                     rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}
                 >

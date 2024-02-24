@@ -641,7 +641,7 @@ const Dashboard = () => {
             </svg>
           </div>
           <div className="p-4 text-right">
-            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Số khóa học đã bán</p>
+            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Số sản phẩm đã bán</p>
             <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{paymentCount}</h4>
           </div>
           <div className="border-t border-blue-gray-50 p-4">
