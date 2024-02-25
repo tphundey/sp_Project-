@@ -570,7 +570,19 @@ const IntroductionPage = () => {
 
 
     const handleAddToCart = () => {
-
+        // Validate color, size, and quantity
+        if (!selectedColor) {
+            message.error('Please select color');
+            return;
+        }
+        if (!selectedSize) {
+            message.error('Please select size');
+            return;
+        }
+        if (!quantity || quantity < 1) {
+            message.error('Please enter a valid quantity');
+            return;
+        }
         if (userIdfirebase) {
             const getUserIdByUid = async (uid) => {
                 try {

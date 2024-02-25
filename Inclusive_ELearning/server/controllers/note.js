@@ -74,5 +74,25 @@ routerNotes.delete("/", async (req, res) => {
     return res.status(500).json({ error: "Could not delete courses" });
   }
 });
+// Delete notes by userId
+routerNotes.delete("/user/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId parameter" });
+    }
 
+    // Assuming your Notes model has a field called "userId" to identify user's notes
+    const deletedNotes = await Notes.deleteMany({ userID: userId });
+    if (!deletedNotes) {
+      return res.status(404).json({ error: "Notes not found for the user" });
+    }
+
+    // Assuming you want to send a response indicating successful deletion
+    return res.status(200).json({ message: "User's notes deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user's notes:", error);
+    return res.status(500).json({ error: "Could not delete user's notes" });
+  }
+});
 module.exports = routerNotes;

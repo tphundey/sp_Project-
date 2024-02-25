@@ -104,13 +104,13 @@ app.post('/send-email', (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-          console.error('Error sending email:', error);
-          res.status(500).send('Internal Server Error');
+            console.error('Error sending email:', error);
+            res.status(500).send('Internal Server Error');
         } else {
-          console.log('Email sent:', info.response);
-          res.status(200).send('Email sent successfully');
+            console.log('Email sent:', info.response);
+            res.status(200).send('Email sent successfully');
         }
-      });
+    });
 });
 // Route chính
 app.get('/', (req, res) => {
@@ -275,15 +275,15 @@ async function vnpayReturnHandler(req, res, next) {
             // }
             if (responseCode === '00') {
 
-        const userIdFilePath = 'userId.txt'; // Change the file name
-        const amountFilePath = 'amount.txt'; // Change the file name
-        const itemsFilePath = 'items.json'; // Change the file name
+                const userIdFilePath = 'userId.txt'; // Change the file name
+                const amountFilePath = 'amount.txt'; // Change the file name
+                const itemsFilePath = 'items.json'; // Change the file name
 
-        // Read data from files
+                // Read data from files
 
-        const userId = fs.readFileSync(userIdFilePath, 'utf-8').trim();
-        const rawAmount = fs.readFileSync(amountFilePath, 'utf-8').trim();
-        const rawItems = fs.readFileSync(itemsFilePath, 'utf-8').trim();
+                const userId = fs.readFileSync(userIdFilePath, 'utf-8').trim();
+                const rawAmount = fs.readFileSync(amountFilePath, 'utf-8').trim();
+                const rawItems = fs.readFileSync(itemsFilePath, 'utf-8').trim();
 
                 // Chuyển đổi giá trị amount thành số
                 const numericAmount = parseFloat(rawAmount.replace(/[^0-9.-]+/g, '')) || 0;
@@ -303,6 +303,16 @@ async function vnpayReturnHandler(req, res, next) {
                     });
 
                     if (updateResponse) {
+                        // Gửi yêu cầu để xóa giỏ hàng
+                        const deleteCartResponse = await fetch(`http://localhost:3000/notes?userID=${userId}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (deleteCartResponse.ok) {
+                            res.render('success', { code: responseCode });
+                        } else {
+                            res.render('success', { code: '97' });
+                        }
                         res.render('success', { code: responseCode });
                     } else {
                         res.render('success', { code: '97' });

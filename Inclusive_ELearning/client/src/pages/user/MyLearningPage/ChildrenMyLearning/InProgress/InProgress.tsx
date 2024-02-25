@@ -113,7 +113,7 @@ const InProgress = () => {
                                     <p>Gía tiền: {order.amount}đ</p>
                                     <p>Tình trạng đơn hàng {order.amount}đ</p>
                                     <p>Hình thức thanh toán: {order.amount}đ</p>
-                                    <p>Trạng thái thanh toán: {order.paymentStatus}</p>
+                         
                                 </div>
                                 <div >
                                     <ul>
