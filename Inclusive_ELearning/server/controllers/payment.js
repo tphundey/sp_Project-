@@ -68,12 +68,15 @@ routerPayments.delete("/:id", async (req, res) => {
   }
 });
 
-routerPayments.delete("/", async (req, res) => {
+routerPayments.delete("/:id", async (req, res) => {
   try {
-    await Payment.deleteMany({});
+    const deletedCourse = await Payment.findByIdAndDelete(req.params.id);
+    if (!deletedCourse) {
+      return res.status(404).json({ error: "Course not found" });
+    }
     return res.status(204).json();
   } catch (error) {
-    return res.status(500).json({ error: "Could not delete courses" });
+    return res.status(500).json({ error: "Could not delete course" });
   }
 });
 

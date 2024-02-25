@@ -19,8 +19,7 @@ const MylearningPageLayout = () => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const tabs: ITabs[] = [
-        { label: 'Khóa học đang học', path: 'progress' },
-        { label: 'Khóa học đã lưu', path: 'saved' },
+        { label: 'Đơn hàng hiện tại', path: 'progress' },
         { label: 'Lịch sử ', path: 'history' }
     ];
 
@@ -98,7 +97,7 @@ const MylearningPageLayout = () => {
             </div>
 
             <div className="mylearningnav">
-                <a href="">Khóa học của tôi</a>
+                <a href="">Đơn hàng của tôi</a>
             </div>
 
             <div className="browsepage">

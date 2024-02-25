@@ -213,16 +213,21 @@ app.post('/create_payment_url', function (req, res, next) {
 
 
 app.post('/saveOrder', (req, res) => {
-    const { amount } = req.body;
+    const { amount, userId, items } = req.body;
 
+    // Save total amount to a file (overwrite existing content)
+    fs.writeFileSync('amount.txt', `${amount}\n`, { flag: 'w' });
 
-    const amountData = `${amount}\n`;
+    // Save user ID to a file (overwrite existing content)
+    fs.writeFileSync('userId.txt', `${userId}\n`, { flag: 'w' });
 
-
-    fs.writeFileSync('amount.txt', amountData);  // Ghi đè nội dung file, chỉ giữ lại amount cuối cùng
+    // Save items to a JSON file (overwrite existing content)
+    fs.writeFileSync('items.json', JSON.stringify(items, null, 2), { flag: 'w' });
 
     res.sendStatus(200);
 });
+
+
 
 app.get('/order/vnpay_return', vnpayReturnHandler);
 
@@ -269,14 +274,16 @@ async function vnpayReturnHandler(req, res, next) {
             //     res.render('success', { code: responseCode });
             // }
             if (responseCode === '00') {
-                const courseIdFilePath = 'course.txt';
-                const userIdFilePath = 'user.txt';
-                const amountFilePath = 'amount.txt'
 
-                // Đọc dữ liệu từ file và chuyển đổi thành số
-                const courseId = fs.readFileSync(courseIdFilePath, 'utf-8').trim();
-                const userId = fs.readFileSync(userIdFilePath, 'utf-8').trim();
-                const rawAmount = fs.readFileSync(amountFilePath, 'utf-8').trim();
+        const userIdFilePath = 'userId.txt'; // Change the file name
+        const amountFilePath = 'amount.txt'; // Change the file name
+        const itemsFilePath = 'items.json'; // Change the file name
+
+        // Read data from files
+
+        const userId = fs.readFileSync(userIdFilePath, 'utf-8').trim();
+        const rawAmount = fs.readFileSync(amountFilePath, 'utf-8').trim();
+        const rawItems = fs.readFileSync(itemsFilePath, 'utf-8').trim();
 
                 // Chuyển đổi giá trị amount thành số
                 const numericAmount = parseFloat(rawAmount.replace(/[^0-9.-]+/g, '')) || 0;
@@ -289,9 +296,9 @@ async function vnpayReturnHandler(req, res, next) {
                         },
                         body: JSON.stringify({
                             paymentStatus: true,
-                            courseId: courseId,
                             userId: userId,
-                            amount: numericAmount
+                            amount: numericAmount,
+                            items: rawItems // Include items in the payload
                         }),
                     });
 

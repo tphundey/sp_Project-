@@ -107,7 +107,16 @@ const CartPage = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ amount: totalToPay }) // Send the total amount to the server
+                body: JSON.stringify({ 
+                    amount: totalToPay,
+                    userId: userId,
+                    items: aggregatedCartItems.map(item => ({
+                        productId: item.productId,
+                        size: item.size,
+                        color: item.color,
+                        quantity: item.quantity
+                    }))
+                })// Send the total amount to the server
             })
             .then((response) => {
                 if (response.ok) {
