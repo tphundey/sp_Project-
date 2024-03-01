@@ -46,16 +46,21 @@ router.delete("/", async (req, res) => {
   }
 });
 // Update
+
 router.patch("/:id", async (req, res) => {
   try {
-    const updatedCourse = await Course.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!updatedCourse) {
+    const courseId = req.params.id; // Lấy id từ URL
+    const course = await Course.findById(courseId); // Tìm khóa học dựa trên id
+    if (!course) {
       return res.status(404).json({ error: "Course not found" });
     }
+    
+    // Tăng giá trị duration lên 1
+    course.duration += 1;
+
+    // Lưu lại khóa học đã cập nhật
+    const updatedCourse = await course.save();
+
     return res.status(200).json(updatedCourse);
   } catch (error) {
     return res.status(500).json({ error: "Could not update course" });

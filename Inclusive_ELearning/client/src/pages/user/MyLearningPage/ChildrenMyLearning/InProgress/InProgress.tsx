@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { firebaseConfig } from '@/components/GetAuth/firebaseConfig';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
-
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -17,7 +16,7 @@ const InProgress = () => {
 
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser: any) => {
             setUser(currentUser);
             setEmail(currentUser?.email);
             setLoading(false);
@@ -76,7 +75,6 @@ const InProgress = () => {
                 setLoading(false);
             });
 
-        // Fetch courses
         fetch("http://localhost:3000/Courses")
             .then(response => {
                 if (response.ok) {
@@ -96,48 +94,56 @@ const InProgress = () => {
                 console.error('Error fetching courses:', error);
             });
     }, [userId]);
+
     if (loading) {
         return <div>Loading...</div>;
     }
-
     return (
-        <div className="orders">
-
+        <div className='orders'>
             {orders.length > 0 ? (
-                <ul>
+                <ul >
+
                     {orders.map(order => (
-                        <li style={{ width: 700}} key={order.id}>
-                            <h3 className='text-xs'>Mã đơn hàng: {order.id}</h3>
-                            <div className="flex justify-between">
-                                <div>
-                                    <p>Gía tiền: {order.amount}đ</p>
-                                    <p>Tình trạng đơn hàng {order.amount}đ</p>
-                                    <p>Hình thức thanh toán: {order.amount}đ</p>
-                         
-                                </div>
-                                <div >
-                                    <ul>
-                                        {order.items.map((item, index) => (
-                                            <li key={index}>
-                                                Size: {item.size}, Color: {item.color}, Quantity: {item.quantity}
-                                                {/* Display course information based on product ID */}
-                                                {courses[item.productId] && (
-                                                    <div className='flex'>
-                                                        <p>{courses[item.productId].courseName}</p>
-                                                        <img width={120} src={courses[item.productId].courseIMG[0]} alt="" />
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
+
+                        <li className='ord-map'  style={{ width: 700 }} key={order.id}>
+                              <h3 className='text-xs ml-12 mb-3'>Mã đơn hàng: {order.id}</h3>
+                            <ul>
+                                {order?.items.map((item: any, index: any) => (
+                                    <li key={index}>
+                                        <div className='flex pro-cr'>
+                                            <img width={120} src={courses[item.productId].courseIMG[0]} alt="" />
+                                            <div>
+                                                <p className='font-medium'>{courses[item.productId].courseName}</p>
+                                                Kích cỡ: {item.size}, Màu sắc: {item.color}, Số lượng: {item.quantity} đôi
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                ))}
+                            </ul>
+                            <div className='ml-12'>
+                                <p>Thành tiền: <span className='text-red-500 font-medium'>đ{order?.amount}</span></p>
+                              
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className='text-green-600 font-medium'> <i class="fa-solid fa-truck-fast"></i> {order?.status}</p>
+                                        <p className='text-sm'>Trạng thái thanh toán: {order?.status2}</p>
+                                        <p className='text-sm'>Trạng thái thanh toán: {order?.option}</p>
+                                    </div>
+
                                 </div>
                             </div>
+                        
                         </li>
+                        
                     ))}
+                    
                 </ul>
+                
             ) : (
                 <p>No orders found.</p>
             )}
+            
         </div>
     );
 };

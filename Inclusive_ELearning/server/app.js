@@ -63,9 +63,6 @@ const routerNotes = require("./controllers/note");
 const routerQuestions = require("./controllers/questions");
 const routerCoupon = require("./controllers/coupon");
 
-
-
-
 app.use("/Courses", coursesController);
 app.use("/Categories", routerCate);
 app.use("/googleAccount", routerGoogleAccounts);
@@ -257,27 +254,12 @@ async function vnpayReturnHandler(req, res, next) {
 
         if (secureHash === signed) {
             const responseCode = vnp_Params['vnp_ResponseCode'];
-            // if (responseCode === '00') {
-            //     const orderIdFilePath = 'order.txt';
-            //     const orderId = fs.readFileSync(orderIdFilePath, 'utf-8').trim();
 
-            //     try {
-            //         if (responseCode) {
-            //             res.render('success', { code: responseCode });
-            //         } else {
-            //             res.render('success', { code: '97' });
-            //         }
-            //     } catch (error) {
-            //         res.render('success', { code: '97' });
-            //     }
-            // } else {
-            //     res.render('success', { code: responseCode });
-            // }
             if (responseCode === '00') {
 
-                const userIdFilePath = 'userId.txt'; // Change the file name
-                const amountFilePath = 'amount.txt'; // Change the file name
-                const itemsFilePath = 'items.json'; // Change the file name
+                const userIdFilePath = 'userId.txt';
+                const amountFilePath = 'amount.txt';
+                const itemsFilePath = 'items.json';
 
                 // Read data from files
 
@@ -298,7 +280,10 @@ async function vnpayReturnHandler(req, res, next) {
                             paymentStatus: true,
                             userId: userId,
                             amount: numericAmount,
-                            items: rawItems // Include items in the payload
+                            status: "Đơn hàng chờ xác nhận",
+                            status2: "Đã thanh toán",
+                            option: "Chuyển khoản",
+                            items: rawItems
                         }),
                     });
 

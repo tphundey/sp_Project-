@@ -112,3 +112,26 @@
     margin: 0px auto;
 }
 
+.pro-cr {
+    display: flex;
+    margin-left: 50px;
+    gap: 20px;
+}
+
+.pro-cr img {
+    width: 15%;
+    height: 100px;
+    border: 1px solid rgb(203, 203, 203);
+}
+
+.orders {
+    border: 1px solid rgb(236, 236, 236);
+    padding: 30px;
+    width: 100%;
+}
+
+.ord-map {
+    border: 1px solid rgb(215, 215, 215);
+    margin-bottom: 10px;
+    padding: 20px;
+}
