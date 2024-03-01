@@ -72,6 +72,53 @@ const CartPage = () => {
                 });
         }
     }, [userId]);
+    const handleCashPayment = async () => {
+        try {
+            const totalToPay = discountCode ? total2 : total; // Consider the discounted total if a discount code is applied
+
+            // Gửi yêu cầu thanh toán tiền mặt lên máy chủ
+            const paymentResponse = await fetch("http://localhost:3000/Payment", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    paymentStatus: true,
+                    userId: userId,
+                    amount: totalToPay,
+                    status: "Đơn hàng chờ xác nhận",
+                    status2: "Chưa thanh toán",
+                    option: "Tiền mặt",
+                    items: aggregatedCartItems.map(item => ({
+                        productId: item.productId,
+                        size: item.size,
+                        color: item.color,
+                        quantity: item.quantity
+                    }))
+                })
+            });
+
+            if (paymentResponse.ok) {
+                // Gửi yêu cầu để xóa giỏ hàng
+                const deleteCartResponse = await fetch(`http://localhost:3000/notes?userID=${userId}`, {
+                    method: 'DELETE'
+                });
+                // Hiển thị thông báo thành công
+                alert("Thanh toán bằng tiền mặt thành công!");
+                window.location.href = "http://localhost:5173/";
+                if (deleteCartResponse.ok) {
+
+                } else {
+
+                }
+            } else {
+
+            }
+        } catch (error) {
+            console.error(error);
+
+        }
+    };
 
     const fetchUserNotes = (userId: string) => {
         fetch(`http://localhost:3000/notes`)
@@ -96,9 +143,9 @@ const CartPage = () => {
             console.error("User ID not found.");
             return;
         }
-    
+
         if (paymentMethod === 'tienmat') {
-            // Xử lý thanh toán bằng tiền mặt
+            handleCashPayment();
         } else if (paymentMethod === 'banking') {
             const totalToPay = discountCode ? total2 : total; // Consider the discounted total if a discount code is applied
             // Gửi tổng số tiền lên máy chủ
@@ -107,7 +154,7 @@ const CartPage = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     amount: totalToPay,
                     userId: userId,
                     items: aggregatedCartItems.map(item => ({
@@ -118,24 +165,24 @@ const CartPage = () => {
                     }))
                 })// Send the total amount to the server
             })
-            .then((response) => {
-                if (response.ok) {
-                    console.log("Total amount saved successfully.");
-                    // Redirect user to the order page
-                    window.location.href = "http://localhost:3000/order";
-                } else {
-                    throw new Error('Failed to save amount.');
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-                // Handle error, maybe display an error message to the user
-            });
+                .then((response) => {
+                    if (response.ok) {
+                        console.log("Total amount saved successfully.");
+                        // Redirect user to the order page
+                        window.location.href = "http://localhost:3000/order";
+                    } else {
+                        throw new Error('Failed to save amount.');
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    // Handle error, maybe display an error message to the user
+                });
         } else {
             console.error("Unsupported payment method:", paymentMethod);
         }
     };
-    
+
 
     const aggregateCartItems = () => {
         const aggregatedItems: any = {};
@@ -270,7 +317,7 @@ const CartPage = () => {
                         <p>{total.toLocaleString()} ₫</p>
                     </div>
                     <div className="payment-options">
-                      <br />
+                        <br />
                         <Radio.Group onChange={(e) => setPaymentMethod(e.target.value)} value={paymentMethod}>
                             <Radio value="tienmat">Thanh toán tiền mặt</Radio>
                             <Radio value="banking">VN Pay</Radio>
