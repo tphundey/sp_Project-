@@ -142,9 +142,17 @@ const IntroductionPage = () => {
                     const allPaymentData = await response.json();
                     setPaymentData(allPaymentData);
 
-                    // Kiểm tra xem có bản ghi thanh toán tương ứng với courseId và userId không
-                    const isAnyPaymentRecord = allPaymentData.some(record => record.courseId === id && record.userId === iduser);
-                    console.log(isAnyPaymentRecord, 'testtttttttt');
+                    // Kiểm tra xem có bản ghi thanh toán tương ứng với productId và userId không
+                    const isAnyPaymentRecord = allPaymentData.some(record => {
+                        // Kiểm tra xem trường items là một mảng hay không
+                        let itemsArray;
+                        if (typeof record.items === 'string') {
+                            itemsArray = JSON.parse(record.items);
+                        } else {
+                            itemsArray = record.items;
+                        }
+                        return itemsArray.some(item => item.productId === id) && record.userId === userID;
+                    });
 
                     setPaymentStatus2(isAnyPaymentRecord); // Set trạng thái đã mua là true nếu có ít nhất một bản ghi, ngược lại là false
                 } else {
@@ -156,7 +164,9 @@ const IntroductionPage = () => {
         };
 
         checkPaymentStatus();
-    }, [id, iduser]);
+    }, [id, userID]); // Dependency on id and userId
+
+    console.log(userID, '555555555555555555555555');
 
 
 
@@ -282,7 +292,7 @@ const IntroductionPage = () => {
                 }
                 const data = await response.json();
                 if (data) {
-                    const payment = data.find((item: any) => item.courseID === id && item.userID === userID && item.payment_status === true);
+                    const payment = data.find((item: any) => item.courseID === id && item.userID === userID && item.payment_status === true && item.status2 === "Đã thanh toán");
                     if (payment) {
                         setCanDisplayForm(true);
                     }
@@ -499,7 +509,7 @@ const IntroductionPage = () => {
                         if (hasUserReviewed) {
                             notification.warning({
                                 message: 'Lỗi',
-                                description: 'Bạn đã đăng đánh giá cho khóa học này rồi.',
+                                description: 'Bạn đã đăng đánh giá cho sản phẩm này rồi.',
                                 placement: 'topRight',
                             });
                         } else if (!review.rating || review.rating === 0) {
@@ -742,7 +752,7 @@ const IntroductionPage = () => {
     const renderedSimilarProducts = shuffledSimilarProducts.slice(0, 7).map((similarProduct: any) => (
         <li key={similarProduct.id} className="prosimi flex items-start gap-4 px-4 py-3">
             <div className="flex items-center shrink-0">
-                <img src={similarProduct.courseIMG[0]} alt="product image" className="w-20 h-20 rounded" />
+                <img src={similarProduct.courseIMG[0]} alt="product image" className="w-20 h-28 tesl rounded" />
             </div>
             <div className="flex flex-col gap-0 min-h-[2rem] items-start justify-center w-full min-w-0">
                 <h4 className='text-xs'>New</h4>
@@ -786,7 +796,7 @@ const IntroductionPage = () => {
                             <div className='mt-1'>{averageRating}</div>
                             <div className='starrev' id="starRating">{starRating}</div>
                             <div className='mt-1'>({reviews.length})</div>
-                            <div className='mt-1'><span>{numberOfMatchingPayments} Đã mua</span></div>
+                            <div className='mt-1'><span> Đã mua</span></div>
                         </div>
                         <div className='flex pro-ull'>
                             {images.map((image, index) => (

@@ -40,6 +40,9 @@
     display: flex;
     align-items: center;
 }
+.tesl{
+    object-fit: cover;
+}
 
 .course-span-leftx {
     display: flex;
