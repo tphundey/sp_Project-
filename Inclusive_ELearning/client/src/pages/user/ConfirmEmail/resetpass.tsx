@@ -117,39 +117,7 @@ const ResetPasswordConfirmation: React.FC = () => {
 
     return (
         <div className='confirm-container'>
-            <p>Nhập thông tin người dùng nếu bạn đang đăng ký tài khoản</p>
-            <Form name='basic' onFinish={handleSendData} autoComplete='off'>
-                <Form.Item
-                    label='Tên hiển thị'
-                    name='displayName'
-                    rules={[{ required: true, message: 'Vui lòng nhập tên hiển thị!' }]}
-                >
-                    <Input type='text' value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-                </Form.Item>
-
-                <Form.Item
-                    label='URL hình ảnh'
-                    name='photoURL'
-                    rules={[{ required: true, message: 'Vui lòng nhập URL hình ảnh!' }]}
-                >
-                    <Input type='text' value={photoURL} onChange={(e) => setPhotoURL(e.target.value)} />
-                </Form.Item>
-
-                <Form.Item
-                    className='tet mr-6'
-                    label='Password'
-                    name='password'
-                    rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-                >
-                    <Input.Password width={20} value={password} onChange={(e) => setPassword(e.target.value)} />
-                </Form.Item>
-
-                <Form.Item>
-                    <Button className='bg-red-500' type='dashed' htmlType='submit'>
-                        Đăng ký
-                    </Button>
-                </Form.Item>
-            </Form>
+       
             <p>Nhập thông tin người dùng nếu bạn đang reset lại mật khẩu</p>
             <label>Nhập mật khẩu mới:</label>
             <input className='border-t-2' type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />

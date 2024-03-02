@@ -1,170 +1,180 @@
-import { useGetCategorysQuery, useRemoveCategoryMutation } from "@/api/category";
-import { useGetProductsQuery } from "@/api/courses";
-import { useGetPaymentsQuery } from "@/api/payment";
-import { useGetRolesQuery, useRemoveRoleMutation } from "@/api/role";
-import { useGetUsersQuery } from "@/api/user";
-import { Icategory } from "@/interfaces/category";
-import { Irole } from "@/interfaces/role";
-import { Iuser } from "@/interfaces/user";
-import { Button, Table, Skeleton, Popconfirm, message, Pagination, DatePicker, Input } from "antd";
-import moment from "moment-timezone";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { formatCurrency } from "@/components/FormatCurency/formatCurency";
+import { useState, useEffect } from 'react';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { Empty } from 'antd';
+import { firebaseConfig } from '@/components/GetAuth/firebaseConfig';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 const AdminPayment = (props: any) => {
-    const [messageApi, contextHolder] = message.useMessage();
-    const { data: usersData } = useGetUsersQuery();
-    const { data: paymentsData, isLoading: isProductLoading } = useGetPaymentsQuery();
-    const { data: courseData } = useGetProductsQuery();
-    const [searchedUserName, setSearchedUserName] = useState<string>("");
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const dataSource = paymentsData?.map((item: any, index: number) => ({
-        key: item.id,
-        stt: (index + 1).toString(),
-        courseId: item.courseId,
-        amount: item.amount,
-        userId: item.userId,
-        createdAt: moment(item.createdAt).format('DD/MM/YYYY'),
-        paymentStatus: item.paymentStatus === true ? ('đã thanh toán') : ('chưa thanh toán')
-    }));
+    const [orders, setOrders] = useState([]);
+    const [courses, setCourses] = useState({});
+    const [email, setEmail] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [userId, setUserID] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleUserNameSearch = (value: string) => {
-        setSearchedUserName(value);
-    };
-    const userMap = new Map(usersData?.map((item: any) => [item.id, item.displayName]));
-    const categoryMap = new Map(courseData?.map((item: any) => [item.id, item.courseName]));
-    console.log(dataSource);
-    const handleDatePickerChange = (date: moment.Moment | null, dateString: string) => {
-        setSelectedDate(dateString);
-    };
-    const filteredData = dataSource?.filter((item) => {
-        const userName = userMap.get(item.userId) || "";
-        const isMatch = userName.toLowerCase().includes(searchedUserName.toLowerCase());
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser: any) => {
+            setUser(currentUser);
+            setEmail(currentUser?.email);
+            setLoading(false);
+        });
+        return () => {
+            unsubscribe();
+        };
+    }, []);
 
-        if (!isMatch) {
-            return false; // Nếu không có ký tự trùng khớp, loại bỏ
+    useEffect(() => {
+        if (email) {
+            fetch(`http://localhost:3000/googleAccount?email=${email}`)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to fetch user data from API.');
+                    }
+                })
+                .then((userDataArray) => {
+                    if (userDataArray.length > 0) {
+                        const userData = userDataArray[0];
+                        setUserID(userData.id);
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
         }
+    }, [email]);
 
-        if (selectedDate) {
-            const itemDate = moment(item.createdAt, 'DD/MM/YYYY');
-            const selectedMoment = moment(selectedDate, 'YYYY-MM-DD');
+    useEffect(() => {
+        fetch(`http://localhost:3000/Payment`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Failed to fetch orders');
+            })
+            .then(data => {
+                // Đảo ngược thứ tự các đơn hàng
+                data.reverse();
+                // Kiểm tra và xử lý cấu trúc không đồng nhất của items
+                data.forEach(order => {
+                    if (typeof order.items === 'string') {
+                        order.items = JSON.parse(order.items);
+                    }
+                });
+                setOrders(data);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                setLoading(false);
+            });
+    }, []);
 
-            if (!itemDate.isSame(selectedMoment, 'day')) {
-                return false;
-            }
+    useEffect(() => {
+        fetch("http://localhost:3000/Courses")
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Failed to fetch courses');
+            })
+            .then(data => {
+                // Reverse the order of the courses array
+                data.reverse();
+                const coursesMap = {};
+                data.forEach(course => {
+                    coursesMap[course.id] = course;
+                });
+                setCourses(coursesMap);
+            })
+            .catch(error => {
+                console.error('Error fetching courses:', error);
+            });
+    }, [userId]);
+
+    useEffect(() => {
+        if (userId) {
+            fetch(`http://localhost:3000/googleAccount`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Failed to fetch user data');
+                })
+                .then(userDataArray => {
+                    // Tìm người dùng với userId tương ứng
+                    const userData = userDataArray.find(user => user.id === userId);
+                    if (userData) {
+                        // Cập nhật thông tin địa chỉ và số điện thoại trong mỗi đơn hàng
+                        const updatedOrders = orders.map(order => {
+                            if (order.userId === userId) {
+                                order.address = userData.address;
+                                order.phone = userData.phone;
+                            }
+                            return order;
+                        });
+                        setOrders(updatedOrders);
+                    } else {
+                        console.error('User not found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
         }
-        return true;
-    });
-    const pageSize = 7;
-    const [currentPage, setCurrentPage] = useState(1);
-    const handlePageChange = (page: any) => {
-        setCurrentPage(page);
-    };
+    }, [userId, orders]);
 
-
-    const startItem = (currentPage - 1) * pageSize;
-    const endItem = currentPage * pageSize;
-    const currentData = dataSource?.slice(startItem, endItem);
-    const columns = [
-        {
-            title: "STT",
-            dataIndex: "stt",
-            key: "stt",
-        },
-        {
-            title: "Giá tiền",
-            dataIndex: "amount",
-            key: "amount",
-            render: (amount: number) => (
-                <span>{formatCurrency(amount)}</span>
-            ),
-        },
-        {
-            title: "Trạng thái",
-            dataIndex: "paymentStatus",
-            key: "paymentStatus",
-            render: (paymentStatus: any) => (
-                <span className="font-bold" style={{ color: paymentStatus ? "green" : "red" }}>
-                    {paymentStatus ? "Thành công" : "Thất bại"}
-                </span>
-            ),
-        },
-        {
-            title: "Tên người dùng",
-            dataIndex: "userId",
-            key: "userId",
-            render: (userId: string) => {
-                const displayName = userMap.get(userId);
-                return displayName;
-            },
-        },
-        {
-            title: "Khóa học",
-            dataIndex: "courseId",
-            key: "courseId",
-            render: (courseId: string) => {
-                const categoryName = categoryMap.get(courseId);
-                return categoryName;
-            },
-        },
-        {
-            title: "Thời gian",
-            dataIndex: "createdAt",
-            key: "createdAt",
-        },
-        // {
-        //     title: "Hành động",
-        //     render: ({ key: id }: { key:string }) => (
-        //         <div className="flex space-x-2">
-        //             <Popconfirm
-        //                 placement="top"
-        //                 title={"Remove course"}
-        //                 description={"Are you sure you want to remove this???"}
-        //                 onConfirm={() => confirm(id)}
-        //                 okText="Yes"
-        //                 cancelText="No"
-        //             >
-        //                 <Button type="primary" danger>
-        //                     xóa
-        //                 </Button>
-        //             </Popconfirm>
-        //             <Button>
-        //                 <Link to={`/admin/role/${id}/edit`}>Sửa</Link>
-        //             </Button>
-        //         </div>
-        //     ),
-        // },
-    ];
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
-        <div>
-            <header className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl">Lịch sử thanh toán</h2>
-                <div>
-                    <DatePicker onChange={handleDatePickerChange} />
-                    <Input
-                        style={{ width: 250, marginLeft: 10 }}
-                        placeholder="Tìm kiếm theo tên người dùng"
-                        onChange={(e) => handleUserNameSearch(e.target.value)}
-                    />
-                </div>
-            </header>
-            {contextHolder}
-            {isProductLoading ? <Skeleton /> : <>
-                <Table
-                    pagination={false}
-                    dataSource={filteredData}
-                    columns={columns}
-                />
-                <Pagination
-                    className="mt-4"
-                    current={currentPage}
-                    total={filteredData?.length}
-                    pageSize={pageSize}
-                    onChange={handlePageChange}
-                />
-            </>}
+        <div className='orders'>
+            {orders.length > 0 ? (
+                <ul>
+                    {orders.map(order => (
+                        <li className='ord-map' style={{ width: 700 }} key={order.id}>
+                            <h3 className='text-xs ml-12 mb-3'>Mã đơn hàng: {order.id}</h3>
+                            <ul>
+                                {order.items.map((item: any, index: any) => (
+                                    <li key={index}>
+                                        <div className='flex pro-cr'>
+                                            {courses[item.productId] && courses[item.productId].courseIMG ? (
+                                                <img width={120} src={courses[item.productId].courseIMG[0]} alt="" />
+                                            ) : (
+                                                <div>No image available</div>
+                                            )}
+                                            <div>
+                                                <p className='font-medium'>{courses[item.productId]?.courseName || 'Unknown Course'}</p>
+                                                Kích cỡ: {item.size}, Màu sắc: {item.color}, Số lượng: {item.quantity} đôi
+                                            </div>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                            <div className='ml-12'>
+                                <p>Thành tiền: <span className='text-red-500 font-medium'>đ{order.amount}</span></p>
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className='text-green-600 font-medium'> <i className="fa-solid fa-truck-fast"></i> {order.status}</p>
+                                        <p className='text-sm'>Trạng thái thanh toán: {order.status2}</p>
+                                        <p className='text-sm'>Trạng thái thanh toán: {order.option}</p>
+                                        <p className='text-sm'>Id người dùng: {order.userId}</p>
+                                        {order.address && <p className='text-sm'>Địa chỉ: {order.address}</p>}
+                                        {order.phone && <p className='text-sm'>Số điện thoại: {order.phone}</p>}
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <Empty className='mt-20' />
+            )}
         </div>
     );
 };
