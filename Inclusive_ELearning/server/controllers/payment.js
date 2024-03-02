@@ -80,5 +80,25 @@ routerPayments.delete("/:id", async (req, res) => {
   }
 });
 
+routerPayments.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
 
+    // Cập nhật trạng thái đơn hàng và trả về tài liệu đã được cập nhật
+    const updatedOrder = await Payment.findOneAndUpdate(
+      { _id: id },
+      { $set: { status: status } },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    return res.status(200).json(updatedOrder);
+  } catch (error) {
+    return res.status(500).json({ error: "Could not update order status" });
+  }
+});
 module.exports = routerPayments;

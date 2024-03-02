@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { Empty } from 'antd';
@@ -25,6 +25,32 @@ const AdminPayment = (props: any) => {
             unsubscribe();
         };
     }, []);
+
+    const updateOrderStatus = (orderId: string, newStatus: string) => {
+        // Implement logic to update order status in backend or local state
+        console.log("Updating order status:", orderId, newStatus);
+
+        // Gửi yêu cầu PATCH đến API để cập nhật trạng thái của đơn hàng
+        fetch(`http://localhost:3000/Payment/${orderId}`, {
+            method: 'PATCH', // hoặc 'PUT' nếu API của bạn yêu cầu
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: newStatus,
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update order status');
+                }
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error updating order status:', error);
+                // Xử lý lỗi hoặc hiển thị thông báo cho người dùng nếu cần
+            });
+    };
 
     useEffect(() => {
         if (email) {
@@ -161,8 +187,14 @@ const AdminPayment = (props: any) => {
                                 <div className="flex justify-between">
                                     <div>
                                         <p className='text-green-600 font-medium'> <i className="fa-solid fa-truck-fast"></i> {order.status}</p>
+                                        <select onChange={(e) => updateOrderStatus(order.id, e.target.value)}>
+                                            <option value="Đơn hàng chờ xác nhận">Đơn hàng chờ xác nhận</option>
+                                            <option value="Đơn hàng đang được đóng gói">Đơn hàng đang được đóng gói</option>
+                                            <option value="Đơn hàng đang được giao cho đơn vị vận chuyển">Đơn hàng đang được giao cho đơn vị vận chuyển</option>
+                                            <option value="Đơn hàng đang được giao">Đơn hàng đang được giao</option>
+                                            <option value="Đơn hàng đã hủy">Đơn hàng đã hủy</option>
+                                        </select>
                                         <p className='text-sm'>Trạng thái thanh toán: {order.status2}</p>
-                                        <p className='text-sm'>Trạng thái thanh toán: {order.option}</p>
                                         <p className='text-sm'>Id người dùng: {order.userId}</p>
                                         {order.address && <p className='text-sm'>Địa chỉ: {order.address}</p>}
                                         {order.phone && <p className='text-sm'>Số điện thoại: {order.phone}</p>}
