@@ -192,6 +192,8 @@ const AdminPayment = (props: any) => {
                                             <option value="Đơn hàng đang được đóng gói">Đơn hàng đang được đóng gói</option>
                                             <option value="Đơn hàng đang được giao cho đơn vị vận chuyển">Đơn hàng đang được giao cho đơn vị vận chuyển</option>
                                             <option value="Đơn hàng đang được giao">Đơn hàng đang được giao</option>
+                                            <option value="Đơn hàng đã được giao thành công">Đơn hàng đã được giao thành công</option>
+                                            <option value="Đơn hàng đang hoàn trả">Đơn hàng đang hoàn trả</option>
                                             <option value="Đơn hàng đã hủy">Đơn hàng đã hủy</option>
                                         </select>
                                         <p className='text-sm'>Trạng thái thanh toán: {order.status2}</p>
