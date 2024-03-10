@@ -581,6 +581,7 @@ const Dashboard = () => {
 
   return (
     <div>
+      
       <div className="grid grid-flow-col gap-4">
         <div className="relative grid flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
           <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
@@ -714,7 +715,21 @@ const Dashboard = () => {
               <div className="stat-value">{dataCount}</div>
             </div>
           </div>
-          <br /><br />
+          <br /><br />  <br /><br />
+         <div className="relative grid flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+          <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+           <img src="https://res.cloudinary.com/dem0uwchx/image/upload/v1708815318/leffajob8nbkbogwoso8.webp" alt="" />
+          </div>
+          <div className="p-4 text-right">
+            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Sản phẩm bán chạy nhất</p>
+            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">Nike Court Vision Low</h4>
+          </div>
+          <div className="border-t border-blue-gray-50 p-4">
+            <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
+              <strong className="text-green-500">12</strong> đã bán được
+            </p>
+          </div>
+        </div>
         </div>
 
         <div style={{ width: "720px", paddingLeft: "20px" }}
@@ -729,6 +744,7 @@ const Dashboard = () => {
             seriesField="total"
             yAxis={{ label: { formatter: (val) => formatCurrency(val) } }}
           />
+          
         </div>
       </div>
 

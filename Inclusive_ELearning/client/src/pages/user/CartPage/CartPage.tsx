@@ -216,11 +216,12 @@ const CartPage = () => {
     const [total2, setTotal2] = useState<number>(0);
 
     const applyDiscount = () => {
+       
         if (!discountCode) {
             message.error("Please enter a discount code.");
             return;
         }
-
+        setTotal2(total);
         fetch("http://localhost:3000/Coupons")
             .then((response) => {
                 if (response.ok) {
@@ -232,8 +233,9 @@ const CartPage = () => {
             .then((couponData) => {
                 if (Array.isArray(couponData)) {
                     const coupon = couponData.find(coupon => coupon.code === discountCode);
-
+                    setTotal2(total);
                     if (coupon) {
+                        setTotal2(total);
                         const discountPercentage = coupon.amount;
                         const discount = (total * discountPercentage) / 100;
                         const discountedTotal = total - discount;
@@ -245,6 +247,7 @@ const CartPage = () => {
 
                         console.log("Total after discount:", discountedTotal);
                     } else {
+                        setTotal2(total);
                         message.error("Invalid discount code.");
                     }
                 } else {
@@ -314,7 +317,11 @@ const CartPage = () => {
                     <br /> <hr />
                     <div className="flex justify-between items-center gap-5 mt-3">
                         <p className='text-lg'>Tổng cộng </p>
-                        <p>{total.toLocaleString()} ₫</p>
+                        {discountCode ? (
+                            <p>{total2.toLocaleString()} ₫</p>
+                        ) : (
+                            <p>{total.toLocaleString()} ₫</p>
+                        )}
                     </div>
                     <div className="payment-options">
                         <br />
