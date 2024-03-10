@@ -61,6 +61,7 @@ import AdminVideoAddINcourse from "./pages/admin/videos/addincourse";
 import CouponManagement from "./pages/admin/coupons/Coupons";
 import EmailButton from "./pages/user/IntroductionPage/sendemailtest";
 import CartPage from "./pages/user/CartPage/CartPage";
+import Signuinadmin from "./pages/user/SignUpPage/SigninAdminPage";
 
 let userRole = 1
 const roleCookie = getCookie('role');
@@ -159,6 +160,7 @@ export const routers = createBrowserRouter([
         children: [
             { index: true, element: <Navigate to="signin" /> },
             { path: "signin", element: <SigninPage /> },
+            { path: "signinadmin", element: <Signuinadmin /> },
             { path: "", element: <ConfirmEmail /> },
             { path: "confirm-loading", element: <ConfirmLoading /> },
             { path: "signup/404", element: <ErrorPage /> },

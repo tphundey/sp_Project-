@@ -185,6 +185,7 @@
     height: 400px;
     width: 300px;
     display: grid;
+    margin-bottom: 150px;
 }
 
 .imgCoureProgress img {
@@ -192,8 +193,4 @@
     height: 110%;
     object-fit: cover;
 
-}
-.dropdown-below {
-    top: auto !important;
-    bottom: -100px !important;
 }

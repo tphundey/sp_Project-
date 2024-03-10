@@ -13,7 +13,7 @@ import Cookies from 'js-cookie';
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const SignupPage = () => {
+const Signuinadmin = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const [user, setUser] = useState(null);
@@ -84,19 +84,19 @@ const SignupPage = () => {
                                 .then((response) => {
                                     console.log('User information sent to API:', response.data);
                                     localStorage.setItem('uid', firebaseUserId);
-                                    navigate('/')
+                                     navigate('/')
                                 })
                                 .catch((error) => {
                                     console.error('Error sending user information to API:', error);
                                     alert('Không thành công');
                                 });
                         } else {
-
+                           
                             // User exists, check if the account is locked
                             const existingUser = response.data[0];
                             const role = response.data[0].role
                             console.log(role, 'dea');
-
+                            
                             if (existingUser.lock) {
                                 console.log('User is locked:', user.email);
                                 alert('Không thể đăng nhập. Tài khoản của bạn đã bị khóa.');
@@ -106,7 +106,7 @@ const SignupPage = () => {
                                 console.log('User logged in successfully:', user.email);
                                 localStorage.setItem('uid', firebaseUserId);
                                 console.log('Role Cookie:', roleCookie);
-                                navigate('/');
+                                 navigate('/');
                             }
                         }
                     })
@@ -129,8 +129,8 @@ const SignupPage = () => {
                     <img className='ml-16' width={120} src="https://kingshoes.vn/data/upload/media/cua-hang-giay-sneaker-chinh-giay-uy-tin-nhat-den-king-shoes-authenti-hcm-2-1624430336.png" alt="" />
                 </div>
                 <div className="login-content">
-                    <div className='lg-ct1'>Tìm kiếm sản phẩm phù hợp và chất lượng</div>
-                    <div className='lg-ct2'>Bằng cách tham gia và thỏa thuận của chúng tôi</div>
+                    <div className='lg-ct1'>Quản trị website hữu ích</div>
+                    <div className='lg-ct2'>Bằng cách tham gia với và thỏa thuận của chúng tôi</div>
                 </div>
                 <div className='login-input'>
                     <Form
@@ -157,7 +157,7 @@ const SignupPage = () => {
 
                         </Form.Item>
 
-                        <button type='submit'>Đồng ý & Tham gia</button>
+                        <button type='submit'>Đồng ý</button>
 
                     </Form>
                     <div className="signup-or">
@@ -172,16 +172,7 @@ const SignupPage = () => {
                     </button>
 
                     <br />
-                    <div className="login-new">
-                        <div>
-                            <div>Bạn chưa có tài khoản? </div>
-                            <div><a href="http://localhost:5173/signin">Đăng ký</a></div>
-                        </div>
-                        <br />
-                        <div>
-
-                        </div>
-                    </div>
+                 
                 </div>
                 <div className='login-footer'>
                     <ul>
@@ -197,5 +188,4 @@ const SignupPage = () => {
     )
 };
 
-export default SignupPage;
-
+export default Signuinadmin;

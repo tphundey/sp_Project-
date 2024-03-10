@@ -111,7 +111,8 @@ header .flex-hd {
 
 .freemonth a {
     font-weight: 600;
-    color: gray;
+    color: rgb(213, 26, 26);
+    font-size: 15px;
 }
 
 nav {

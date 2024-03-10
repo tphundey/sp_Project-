@@ -98,13 +98,13 @@ const ListCourse = () => {
                 </label><br />
                 <label>
                     <b>  Lọc theo giá tiền:</b>  <br /> <br />
-                    <Select style={{ width: 200 }} open value={priceRange} onChange={handlePriceRangeChange}>
+                    <Select style={{ width: 200 }}  value={priceRange} onChange={handlePriceRangeChange}>
                         <Option value="all">Tất cả</Option>
                         <Option value="0-500k">Từ 0 đến 500k</Option>
                         <Option value="500k-1m">Từ 500k đến 1 triệu</Option>
                         <Option value="1m-2m">Từ 1 triệu đến 2 triệu</Option>
                     </Select>
-                </label> <br /><br /><br /><br /><br /><br /><br />
+                </label> <br /><br />
                 <label>
                     <b>  Lọc theo danh mục:</b>  <br /> <br />
                     <Select value={selectedCategory} onChange={handleCategoryChange}>
@@ -116,8 +116,8 @@ const ListCourse = () => {
                 </label> <br />
                 <label>
                     <b>  Lọc theo bảng màu: </b> <br /> <br />
-                    <Select style={{ width: 120 }} value={selectedColor} onChange={handleColorChange} open dropdownClassName="dropdown-below">
-                        <Option value="">Tất cả</Option>
+                    <Select style={{ width: 120 }} value={selectedColor} onChange={handleColorChange}  dropdownClassName="dropdown-below">
+                        <Option value="all">Tất cả</Option>
                         <Option value="Red">🟥 Đỏ</Option>
                         <Option value="Blue">🟦 Xanh</Option>
                         <Option value="Yellow">🟨 Vàng</Option>
@@ -129,53 +129,54 @@ const ListCourse = () => {
                 </label>
             </div>
             <div className="listpro-one">
-                {sortedAndFilteredCourses.slice(0, visibleCourses).map((course) => (
-                    <div key={course.id}>
-                        <div className='ty-contai'>
-                            <div className="courseProgress">
-                                <div className="imgCoureProgress">
-                                    <img src={course.courseIMG[0]} alt="" />
-                                </div>
-                                <div className="infoCourseProgress">
-                                    <h3 style={{ borderRadius: 50 }} className='bg-red-500 text-white w-9 p-1 '>New</h3>
-                                    <a href={`/introduction/${course.id}`}>
-                                        <h2>{course.courseName}</h2>
-                                    </a>
-                                    <div className='mt-4'>{formatCurrency(course.price)}</div>
-                                    <div className="fl-info-progress mt-2">
-                                        <div className="fl1-info-progress">
-                                            <img
-                                                className='mt-1'
-                                                src="https://kingshoes.vn/data/upload/media/cua-hang-giay-sneaker-chinh-giay-uy-tin-nhat-den-king-shoes-authenti-hcm-2-1624430336.png"
-                                                alt=""
-                                            />
+                {sortedAndFilteredCourses.slice(0, visibleCourses).map((course) => {
+                    // Find the category associated with the course
+                    const category = categories.find(cat => cat.id === course.categoryID);
+                    // Display course details along with the category name if found
+                    return (
+                        <div key={course.id}>
+                            <div className='ty-contai'>
+                                <div className="courseProgress">
+                                    <div className="imgCoureProgress">
+                                        <img src={course.courseIMG[0]} alt="" />
+                                    </div>
+                                    <div className="infoCourseProgress">
+                                        <h3 style={{ borderRadius: 50 }} className='bg-red-500 text-white w-9 p-1 '>New</h3>
+                                        <a href={`/introduction/${course.id}`}>
+                                            <h2>{course.courseName}</h2>
+                                        </a>
+                                        <div className="categoryName text-sm">Danh mục: {category ? category.categoryName : 'Unknown'}</div> {/* Display category name or 'Unknown' if not found */}
+                                        <div className='mt-4'>{formatCurrency(course.price)}</div>
+                                        <div className="fl-info-progress mt-2">
+                                            <div className="fl1-info-progress">
+                                                <img
+                                                    className='mt-1'
+                                                    src="https://kingshoes.vn/data/upload/media/cua-hang-giay-sneaker-chinh-giay-uy-tin-nhat-den-king-shoes-authenti-hcm-2-1624430336.png"
+                                                    alt=""
+                                                />
+                                            </div>
+                                            <div className="fl2-info-progress">My store - By: Trần Phùng</div>
                                         </div>
-                                        <div className="fl2-info-progress">My store - By: Trần Phùng</div>
+                                    </div>
+                                </div>
+                                <div className="option-course-progress">
+                                    <div className="dropdown dropdown-right dropdown-end mt-5">
+                                        <label tabIndex={0} className="btn m-1">
+                                            <i className="fa-solid fa-ellipsis"></i>
+                                        </label>
+                                        <ul
+                                            tabIndex={0}
+                                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 right-0 mt-8"
+                                        >
+                                            <Button onClick={() => handleBookmarkClick(course.id)}>Thêm giỏ hàng</Button>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
-                            <div className="option-course-progress">
-                                <div className="dropdown dropdown-right dropdown-end mt-5">
-                                    <label tabIndex={0} className="btn m-1">
-                                        <i className="fa-solid fa-ellipsis"></i>
-                                    </label>
-                                    <ul
-                                        tabIndex={0}
-                                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 right-0 mt-8"
-                                    >
-                                        <Button onClick={() => handleBookmarkClick(course.id)}>Thêm giỏ hàng</Button>
-                                    </ul>
-                                </div>
-                            </div>
+                            <hr />
                         </div>
-                        <hr />
-                    </div>
-                ))}
-                {filteredCourses.length > visibleCourses && (
-                    <button className="show-more-button font-bold" onClick={handleShowMore}>
-                        Xem thêm
-                    </button>
-                )}
+                    );
+                })}
             </div>
         </div>
     );

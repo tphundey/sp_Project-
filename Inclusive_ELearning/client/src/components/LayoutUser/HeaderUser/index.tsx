@@ -26,7 +26,6 @@ const HeaderUser: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
     const [isListVisible, setListVisible] = useState<boolean>(false);
-    const [isSwapOn, setIsSwapOn] = useState(false); // Thêm state mới
     const [email, setEmail] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [userId, setUserID] = useState<string | null>(null);
@@ -261,7 +260,7 @@ const HeaderUser: React.FC = () => {
                                                                 <li >
                                                                     <Link to={`/Profile/${user.uid}`}>
                                                                         <Button style={{ width: 170 }}>
-                                                                            Profile
+                                                                            Thông tin
                                                                         </Button>
                                                                     </Link>
 
@@ -307,7 +306,7 @@ const HeaderUser: React.FC = () => {
                                 </li>
                             </ul>
                             <div className='freemonth'>
-                                <a href="/signup">Bắt đầu mua sắm</a>
+                                <a href="/signinadmin">Tư cách quản trị viên</a>
                             </div>
                         </div>
                     </div>
