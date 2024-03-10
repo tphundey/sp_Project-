@@ -19,6 +19,8 @@ const CartPage = () => {
     const [loading, setLoading] = useState(true);
     const [userNotes, setUserNotes] = useState<any[]>([]);
     const [courseData, setCourseData] = useState<any[]>([]);
+    const [productQuantities, setProductQuantities] = useState<{ [productId: string]: number }>({});
+    const [total2, setTotal2] = useState<number>(0);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -72,11 +74,11 @@ const CartPage = () => {
                 });
         }
     }, [userId]);
+
     const handleCashPayment = async () => {
         try {
-            const totalToPay = discountCode ? total2 : total; // Consider the discounted total if a discount code is applied
+            const totalToPay = discountCode ? total2 : calculateTotal(); 
 
-            // Gửi yêu cầu thanh toán tiền mặt lên máy chủ
             const paymentResponse = await fetch("http://localhost:3000/Payment", {
                 method: 'POST',
                 headers: {
@@ -99,11 +101,9 @@ const CartPage = () => {
             });
 
             if (paymentResponse.ok) {
-                // Gửi yêu cầu để xóa giỏ hàng
                 const deleteCartResponse = await fetch(`http://localhost:3000/notes?userID=${userId}`, {
                     method: 'DELETE'
                 });
-                // Hiển thị thông báo thành công
                 alert("Thanh toán bằng tiền mặt thành công!");
                 window.location.href = "http://localhost:5173/";
                 if (deleteCartResponse.ok) {
@@ -147,8 +147,8 @@ const CartPage = () => {
         if (paymentMethod === 'tienmat') {
             handleCashPayment();
         } else if (paymentMethod === 'banking') {
-            const totalToPay = discountCode ? total2 : total; // Consider the discounted total if a discount code is applied
-            // Gửi tổng số tiền lên máy chủ
+            const totalToPay = discountCode ? total2 : calculateTotal(); 
+
             fetch("http://localhost:3000/saveOrder", {
                 method: 'POST',
                 headers: {
@@ -163,12 +163,11 @@ const CartPage = () => {
                         color: item.color,
                         quantity: item.quantity
                     }))
-                })// Send the total amount to the server
+                })
             })
                 .then((response) => {
                     if (response.ok) {
                         console.log("Total amount saved successfully.");
-                        // Redirect user to the order page
                         window.location.href = "http://localhost:3000/order";
                     } else {
                         throw new Error('Failed to save amount.');
@@ -176,13 +175,11 @@ const CartPage = () => {
                 })
                 .catch((error) => {
                     console.error(error);
-                    // Handle error, maybe display an error message to the user
                 });
         } else {
             console.error("Unsupported payment method:", paymentMethod);
         }
     };
-
 
     const aggregateCartItems = () => {
         const aggregatedItems: any = {};
@@ -199,29 +196,25 @@ const CartPage = () => {
 
     const aggregatedCartItems = aggregateCartItems();
 
-    const calculateSubtotal = () => {
-        let subtotal = 0;
+    const calculateTotal = () => {
+        let total = 0;
         aggregatedCartItems.forEach((item) => {
             const course = courseData.find((course) => course.id === item.productId);
             if (course) {
-                subtotal += item.quantity * parseFloat(course.price);
+                const price = parseFloat(course.price);
+                const quantity = productQuantities[item.productId] || item.quantity;
+                total += quantity * price;
             }
         });
-        return subtotal;
+        return total;
     };
 
-    const subtotal = calculateSubtotal();
-    const shippingFee = 250000;
-    const total = subtotal + shippingFee;
-    const [total2, setTotal2] = useState<number>(0);
-
     const applyDiscount = () => {
-       
         if (!discountCode) {
             message.error("Please enter a discount code.");
             return;
         }
-        setTotal2(total);
+
         fetch("http://localhost:3000/Coupons")
             .then((response) => {
                 if (response.ok) {
@@ -233,21 +226,17 @@ const CartPage = () => {
             .then((couponData) => {
                 if (Array.isArray(couponData)) {
                     const coupon = couponData.find(coupon => coupon.code === discountCode);
-                    setTotal2(total);
                     if (coupon) {
-                        setTotal2(total);
                         const discountPercentage = coupon.amount;
-                        const discount = (total * discountPercentage) / 100;
-                        const discountedTotal = total - discount;
+                        const discount = calculateTotal() * (discountPercentage / 100);
+                        const discountedTotal = calculateTotal() - discount;
                         setDiscountAmount(discount);
-                        const discountValue = total * (discountPercentage / 100);
+                        const discountValue = calculateTotal() * (discountPercentage / 100);
                         setDiscountValue(discountValue);
                         setTotal2(discountedTotal);
                         message.success("Discount applied successfully.");
-
                         console.log("Total after discount:", discountedTotal);
                     } else {
-                        setTotal2(total);
                         message.error("Invalid discount code.");
                     }
                 } else {
@@ -260,6 +249,22 @@ const CartPage = () => {
             });
     };
 
+    const updateProductQuantity = (productId: string, quantity: number) => {
+        setProductQuantities(prevQuantities => ({
+            ...prevQuantities,
+            [productId]: quantity
+        }));
+    };
+    const [addressOption, setAddressOption] = useState<string>('default');
+    const [customAddress, setCustomAddress] = useState<string>('');
+    const [phoneNumber, setPhoneNumber] = useState<string>('');
+
+    // Các phần còn lại của state và useEffect
+
+    // Xử lý sự kiện khi người dùng chọn lựa chọn địa chỉ
+    const handleAddressOptionChange = (e) => {
+        setAddressOption(e.target.value);
+    };
     return (
         <div className='container-cart'>
             <div className='tit-left'>
@@ -282,6 +287,20 @@ const CartPage = () => {
                         imageUrl = course.courseIMG[0];
                     }
                     const price = parseFloat(course.price);
+                    const productQuantity = productQuantities[productId] || quantity;
+
+                    const handleIncrease = () => {
+                        updateProductQuantity(productId, productQuantity + 1);
+                        recalculateTotal();
+                    };
+
+                    const handleDecrease = () => {
+                        if (productQuantity > 1) {
+                            updateProductQuantity(productId, productQuantity - 1);
+                            recalculateTotal();
+                        }
+                    };
+
                     return (
                         <div className="cart-product mt-5" key={index}>
                             <div><img style={{ width: 150 }} src={imageUrl} alt="" /></div>
@@ -292,9 +311,11 @@ const CartPage = () => {
                                 </div>
                                 <p className='text-gray-500'>Màu sắc: {color}</p>
                                 <p className='text-gray-500'>Kích cỡ: {size}</p>
-                                <p className='text-gray-500'>Số lượng: {quantity}</p>
-                                <i className="fas fa-plus icon mr-2"></i>
-                                <i className="fas fa-minus icon"></i>
+                                <div className='text-gray-500'>Số lượng:
+                                    <button onClick={handleDecrease}>-</button>
+                                    {productQuantity}
+                                    <button onClick={handleIncrease}>+</button>
+                                </div>
                             </div>
                         </div>
                     );
@@ -308,11 +329,11 @@ const CartPage = () => {
                 <div className="countc-cart mt-10">
                     <div className="flex justify-between items-center gap-5">
                         <p className='text-lg'>Tổng phụ: </p>
-                        <p>{subtotal.toLocaleString()} ₫</p>
+                        <p>{calculateTotal().toLocaleString()} ₫</p>
                     </div>
                     <div className="flex justify-between items-center gap-5">
                         <p className='text-lg'>Ước tính giao hàng và xử lý:</p>
-                        <p>{shippingFee.toLocaleString()} ₫</p>
+                        <p>{parseFloat(total2.toFixed(2)).toLocaleString()} ₫</p>
                     </div>
                     <br /> <hr />
                     <div className="flex justify-between items-center gap-5 mt-3">
@@ -320,7 +341,7 @@ const CartPage = () => {
                         {discountCode ? (
                             <p>{total2.toLocaleString()} ₫</p>
                         ) : (
-                            <p>{total.toLocaleString()} ₫</p>
+                            <p>{(calculateTotal() + 250000).toLocaleString()} ₫</p>
                         )}
                     </div>
                     <div className="payment-options">
@@ -330,6 +351,30 @@ const CartPage = () => {
                             <Radio value="banking">VN Pay</Radio>
                         </Radio.Group>
                     </div>
+                    <div className='payment-options'>
+                <br />
+                
+                <Radio.Group onChange={handleAddressOptionChange} value={addressOption}>
+                    <Radio value="default">Địa chỉ mặc định</Radio>
+                    <Radio value="custom">Nhập địa chỉ mới</Radio>
+                </Radio.Group>
+                {/* Nếu người dùng chọn nhập địa chỉ mới, hiển thị form nhập thông tin */}
+                {addressOption === 'custom' && (
+                    <div>
+                        <Input
+                        className='mb-3'
+                            placeholder="Nhập địa chỉ mới"
+                            value={customAddress}
+                            onChange={(e) => setCustomAddress(e.target.value)}
+                        /> <br />
+                        <Input
+                            placeholder="Nhập số điện thoại"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                        />
+                    </div>
+                )}
+            </div>
                     <br />
                     <div className="discount-section flex  gap-3">
                         <Input
