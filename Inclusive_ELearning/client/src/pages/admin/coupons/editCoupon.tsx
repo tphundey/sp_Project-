@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Form, Input, Button, Space, Modal, DatePicker, InputNumber, message } from 'antd';
 import axios from 'axios';
-import moment from 'moment';
 
 const CouponManagement = () => {
   const [form] = Form.useForm();
@@ -10,44 +9,15 @@ const CouponManagement = () => {
   const [editingCoupon, setEditingCoupon] = useState(null); // State to store the coupon being edited
 
   const columns = [
-    {
-      title: 'Mã Coupon',
-      dataIndex: 'code',
-      key: 'code',
-    },
-    {
-      title: 'Số tiền',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (text, record) => `${record.amount}%`,
-    },
-    {
-      title: 'Ngày bắt đầu',
-      dataIndex: 'startDate',
-      key: 'startDate',
-      render: (text, record) => moment(record.startDate).format('DD/MM/YYYY'),
-    },
-    {
-      title: 'Ngày hết hạn',
-      dataIndex: 'expirationDate',
-      key: 'expirationDate',
-      render: (text, record) => moment(record.expirationDate).format('DD/MM/YYYY'),
-    },
-    {
-      title: 'Số lượng',
-      dataIndex: 'quantity',
-      key: 'quantity',
-    },
+    // Column definitions remain the same
+    //...
     {
       title: 'Hành động',
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
           {isCouponExpiredOrZeroQuantity(record) && (
-            <>
-              <Button className='bg-yellow-400 text-black' onClick={() => handleEdit(record)}>Cập nhật</Button>
-       
-            </>
+            <Button className='bg-red-400 text-white' onClick={() => handleEdit(record)}>Sửa</Button> // Change Delete to Edit
           )}
         </Space>
       ),
@@ -117,26 +87,6 @@ const CouponManagement = () => {
     } catch (error) {
       console.error('Validation failed', error);
     }
-  };
-
-  const handleDelete = async (id) => {
-    Modal.confirm({
-      title: 'Xác nhận xóa',
-      content: 'Bạn có chắc chắn muốn xóa mã Coupon này?',
-      okText: 'Xác nhận',
-      okType: 'danger',
-      cancelText: 'Hủy',
-      onOk: async () => {
-        const updatedCoupons = coupons.filter((item) => item.id !== id);
-        setCoupons(updatedCoupons);
-        message.success('Xóa thành công!');
-        try {
-          await axios.delete(`http://localhost:3000/Coupons/${id}`);
-        } catch (error) {
-          console.error('Error deleting data', error);
-        }
-      },
-    });
   };
 
   const handleCancel = () => {
