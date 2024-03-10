@@ -1,17 +1,12 @@
-
 import { useGetProductsQuery } from "@/api/courses";
-import { useGetReviewsQuery, useRemoveReviewMutation } from "@/api/review";
-import { useGetRolesQuery, useRemoveRoleMutation } from "@/api/role";
+import { useGetReviewsQuery } from "@/api/review";
 import { useGetUsersQuery } from "@/api/user";
-
-import { Button, Table, Skeleton, Popconfirm, message, Pagination, Rate } from "antd";
+import { Button, Table, Skeleton, message, Pagination, Rate, Modal } from "antd";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 const AdminReview = (props: any) => {
     const [messageApi, contextHolder] = message.useMessage();
     const { data: reviewData, isLoading: isProductLoading } = useGetReviewsQuery();
-    const [removeReview] = useRemoveReviewMutation();
     const { data: usersData } = useGetUsersQuery();
     const { data: courseData } = useGetProductsQuery();
     const dataSource = reviewData?.map((item: any, index: number) => ({
@@ -27,18 +22,8 @@ const AdminReview = (props: any) => {
     const userMap = new Map(usersData?.map((item: any) => [item.id, item.displayName]));
     const categoryMap = new Map(courseData?.map((item: any) => [item.id, item.courseName]));
 
-    // console.log(dataSource);
-
-    const confirm = (id: string) => {
-        removeReview(id)
-            .unwrap()
-            .then(() => {
-                messageApi.open({
-                    type: "success",
-                    content: "Xóa thành công!",
-                });
-            });
-    };
+    const [userDetailVisible, setUserDetailVisible] = useState(false);
+    const [currentUserDetail, setCurrentUserDetail] = useState<any>(null);
 
     const columns = [
         {
@@ -69,7 +54,15 @@ const AdminReview = (props: any) => {
             },
         },
         {
-            title: "khóa học",
+            title: "Thông tin người dùng",
+            dataIndex: "userID",
+            key: "userDetail",
+            render: (userID: string) => (
+                <Button type="link" onClick={() => showUserDetail(userID)}>Chi tiết</Button>
+            ),
+        },
+        {
+            title: "Sản phẩm",
             dataIndex: "courseID",
             key: "courseID",
             render: (courseID: string) => {
@@ -77,26 +70,20 @@ const AdminReview = (props: any) => {
                 return categoryName;
             },
         },
-        {
-            title: "Hành động",
-            render: ({ key: id }: { key: string }) => (
-                <div className="flex space-x-2">
-                    <Popconfirm
-                        placement="top"
-                        title={"Xóa đánh giá"}
-                        description={"Bạn có chắc chắn xóa không ?"}
-                        onConfirm={() => confirm(id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button type="primary" danger>
-                            xóa
-                        </Button>
-                    </Popconfirm>
-                </div>
-            ),
-        },
     ];
+
+    const showUserDetail = (userID: string) => {
+        const userDetail = usersData.find((user: any) => user.id === userID);
+        if (userDetail) {
+            setCurrentUserDetail(userDetail);
+            setUserDetailVisible(true);
+        }
+    };
+
+    const handleCancel = () => {
+        setUserDetailVisible(false);
+    };
+
     const pageSize = 4;
     const [currentPage, setCurrentPage] = useState(1);
     const handlePageChange = (page: any) => {
@@ -105,26 +92,43 @@ const AdminReview = (props: any) => {
     const startItem = (currentPage - 1) * pageSize;
     const endItem = currentPage * pageSize;
     const currentData = dataSource?.slice(startItem, endItem);
+
     return (
         <div>
             <header className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl">Quản lý Đánh giá</h2>
             </header>
             {contextHolder}
-            {isProductLoading ? <Skeleton /> : <>
-                <Table
-                    pagination={false}
-                    dataSource={currentData}
-                    columns={columns}
-                />
-                <Pagination
-                    className="mt-4"
-                    current={currentPage}
-                    total={dataSource?.length}
-                    pageSize={pageSize}
-                    onChange={handlePageChange}
-                />
-            </>}
+            {isProductLoading ? <Skeleton /> : (
+                <>
+                    <Table
+                        pagination={false}
+                        dataSource={currentData}
+                        columns={columns}
+                    />
+                    <Pagination
+                        className="mt-4"
+                        current={currentPage}
+                        total={dataSource?.length}
+                        pageSize={pageSize}
+                        onChange={handlePageChange}
+                    />
+                    <Modal
+                        title="Thông tin người dùng"
+                        visible={userDetailVisible}
+                        onCancel={handleCancel}
+                        footer={null}
+                    >
+                        {currentUserDetail && (
+                            <div>
+                                <p><strong>Tên người dùng:</strong> {currentUserDetail.displayName}</p>
+                                <p><strong>Email:</strong> {currentUserDetail.email}</p>
+                                <p><strong>Số điện thoại:</strong> {currentUserDetail.phone}</p>
+                            </div>
+                        )}
+                    </Modal>
+                </>
+            )}
         </div>
     );
 };
