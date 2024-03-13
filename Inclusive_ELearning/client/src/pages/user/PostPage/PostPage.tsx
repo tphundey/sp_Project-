@@ -34,7 +34,7 @@ const Post = () => {
         content: "",
         image: "",
         likes: 0,
-        likedBy: [],  // Initialize likedBy as an array
+        likedBy: [],  
     });
 
 
@@ -45,7 +45,7 @@ const Post = () => {
             formData.append("upload_preset", "your_cloudinary_upload_preset");
 
             const response = await axios.post(
-                "https://api.cloudinary.com/v1_1/dsk9jrxzf/image/upload?upload_preset=movies",
+                "https://api.cloudinary.com/v1_1/dem0uwchx/image/upload?upload_preset=t7ahvua5",
                 formData
             );
 
@@ -93,7 +93,7 @@ const Post = () => {
 
                 const newPost = await response.json();
                 setAllPosts((prevPosts: any) => [newPost, ...prevPosts]);
-
+                window.location.reload();
                 message.success("Đăng bài thành công");
             } else {
                 message.error("Error posting the data.");
@@ -124,6 +124,7 @@ const Post = () => {
 
                 setLikedPosts(userLikedPosts.map(post => post.id));
                 setAllPosts(data.reverse());
+            
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
