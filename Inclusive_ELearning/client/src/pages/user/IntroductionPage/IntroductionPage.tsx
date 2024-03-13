@@ -771,7 +771,7 @@ const IntroductionPage = () => {
         return <Skeleton active />;
     }
     const formattedPrice = formatCurrency(product.price);
-    const truncatedDuration = product.duration.toFixed(1);
+
 
     return (
         <div className="containerCss">

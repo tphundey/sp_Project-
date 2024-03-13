@@ -47,20 +47,14 @@ routerCoupon.get("/:id", async (req, res) => {
     return res.status(500).json({ error: "Could not retrieve course" });
   }
 });
-// Update Likes, LikedBy, and Comments
 routerCoupon.put('/:id', async (req, res) => {
   try {
-    const { quantity } = req.body;
+    const updatedFields = req.body;
 
-    // Ensure that the quantity is a positive integer
-    if (!Number.isInteger(quantity) || quantity < 0) {
-      return res.status(400).json({ error: 'Invalid quantity value' });
-    }
-
-    // Find the coupon by ID and update the quantity
+    // Find the coupon by ID and update all fields specified in the request
     const updatedCoupon = await Coupons.findByIdAndUpdate(
       req.params.id,
-      { $set: { quantity } },
+      { $set: updatedFields },
       { new: true }
     );
 

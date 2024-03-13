@@ -119,25 +119,6 @@ const CouponManagement = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    Modal.confirm({
-      title: 'Xác nhận xóa',
-      content: 'Bạn có chắc chắn muốn xóa mã Coupon này?',
-      okText: 'Xác nhận',
-      okType: 'danger',
-      cancelText: 'Hủy',
-      onOk: async () => {
-        const updatedCoupons = coupons.filter((item) => item.id !== id);
-        setCoupons(updatedCoupons);
-        message.success('Xóa thành công!');
-        try {
-          await axios.delete(`http://localhost:3000/Coupons/${id}`);
-        } catch (error) {
-          console.error('Error deleting data', error);
-        }
-      },
-    });
-  };
 
   const handleCancel = () => {
     setModalVisible(false);
