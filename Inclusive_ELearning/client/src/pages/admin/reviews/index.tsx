@@ -15,6 +15,7 @@ const AdminReview = (props: any) => {
         rating: item.rating,
         comment: item.comment,
         userID: item.userID,
+        productImage: courseData?.find((course: any) => course.id === item.courseID)?.courseIMG,
         courseID: item.courseID,
         date: item.date
     }));
@@ -70,6 +71,17 @@ const AdminReview = (props: any) => {
                 return categoryName;
             },
         },
+        {
+            title: "Hình ảnh",
+            dataIndex: "courseID",
+            key: "courseID",
+            render: (courseID: string, record: any) => (
+                <>
+                    <img src={record.productImage} alt="Product" style={{ width: '50px', height: 'auto', marginRight: '10px' }} />
+                    {record.productName}
+                </>
+            ),
+        }
     ];
 
     const showUserDetail = (userID: string) => {
