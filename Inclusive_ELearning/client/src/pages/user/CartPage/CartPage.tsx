@@ -77,7 +77,7 @@ const CartPage = () => {
 
     const handleCashPayment = async () => {
         try {
-            const totalToPay = discountCode ? total2 : calculateTotal(); 
+            const totalToPay = discountCode ? total2 : calculateTotal();
 
             const paymentResponse = await fetch("http://localhost:3000/Payment", {
                 method: 'POST',
@@ -147,7 +147,7 @@ const CartPage = () => {
         if (paymentMethod === 'tienmat') {
             handleCashPayment();
         } else if (paymentMethod === 'banking') {
-            const totalToPay = discountCode ? total2 : calculateTotal(); 
+            const totalToPay = discountCode ? total2 : calculateTotal();
 
             fetch("http://localhost:3000/saveOrder", {
                 method: 'POST',
@@ -254,17 +254,22 @@ const CartPage = () => {
             ...prevQuantities,
             [productId]: quantity
         }));
+        recalculateTotal(); // Gọi hàm để tính lại số tiền tổng cộng
     };
+
+    const recalculateTotal = () => {
+        const newTotal = calculateTotal(); // Tính lại số tiền tổng cộng
+        setTotal2(newTotal); // Cập nhật state số tiền tổng cộng mới
+    };
+
     const [addressOption, setAddressOption] = useState<string>('default');
     const [customAddress, setCustomAddress] = useState<string>('');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
 
-    // Các phần còn lại của state và useEffect
-
-    // Xử lý sự kiện khi người dùng chọn lựa chọn địa chỉ
     const handleAddressOptionChange = (e) => {
         setAddressOption(e.target.value);
     };
+
     return (
         <div className='container-cart'>
             <div className='tit-left'>
@@ -291,13 +296,11 @@ const CartPage = () => {
 
                     const handleIncrease = () => {
                         updateProductQuantity(productId, productQuantity + 1);
-                        recalculateTotal();
                     };
 
                     const handleDecrease = () => {
                         if (productQuantity > 1) {
                             updateProductQuantity(productId, productQuantity - 1);
-                            recalculateTotal();
                         }
                     };
 
@@ -307,7 +310,7 @@ const CartPage = () => {
                             <div>
                                 <div className='flex justify-between w-m'>
                                     <h2>{course.courseName}</h2>
-                                    <h2>{price.toLocaleString()}₫</h2>
+                                    <h2>{(price * productQuantity).toLocaleString()}₫</h2>
                                 </div>
                                 <p className='text-gray-500'>Màu sắc: {color}</p>
                                 <p className='text-gray-500'>Kích cỡ: {size}</p>
@@ -320,7 +323,6 @@ const CartPage = () => {
                         </div>
                     );
                 })}
-
             </div>
             <div className='tit-right'>
                 <br />
@@ -352,29 +354,27 @@ const CartPage = () => {
                         </Radio.Group>
                     </div>
                     <div className='payment-options'>
-                <br />
-                
-                <Radio.Group onChange={handleAddressOptionChange} value={addressOption}>
-                    <Radio value="default">Địa chỉ mặc định</Radio>
-                    <Radio value="custom">Nhập địa chỉ mới</Radio>
-                </Radio.Group>
-                {/* Nếu người dùng chọn nhập địa chỉ mới, hiển thị form nhập thông tin */}
-                {addressOption === 'custom' && (
-                    <div>
-                        <Input
-                        className='mb-3'
-                            placeholder="Nhập địa chỉ mới"
-                            value={customAddress}
-                            onChange={(e) => setCustomAddress(e.target.value)}
-                        /> <br />
-                        <Input
-                            placeholder="Nhập số điện thoại"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                        />
+                        <br />
+                        <Radio.Group onChange={handleAddressOptionChange} value={addressOption}>
+                            <Radio value="default">Địa chỉ mặc định</Radio>
+                            <Radio value="custom">Nhập địa chỉ mới</Radio>
+                        </Radio.Group>
+                        {addressOption === 'custom' && (
+                            <div>
+                                <Input
+                                    className='mb-3'
+                                    placeholder="Nhập địa chỉ mới"
+                                    value={customAddress}
+                                    onChange={(e) => setCustomAddress(e.target.value)}
+                                /> <br />
+                                <Input
+                                    placeholder="Nhập số điện thoại"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                />
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
                     <br />
                     <div className="discount-section flex  gap-3">
                         <Input

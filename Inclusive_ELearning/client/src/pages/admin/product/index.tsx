@@ -3,7 +3,7 @@ import { Button, Table, Skeleton, Popconfirm, message, Pagination, Modal, Input 
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { formatCurrency } from '@/components/FormatCurency/formatCurency';
-import {  useRemoveVideoMutation } from "@/api/video";
+import { useRemoveVideoMutation } from "@/api/video";
 import { Image } from 'antd';
 
 const AdminProduct = () => {
@@ -87,7 +87,15 @@ const AdminProduct = () => {
     const handleResetSearch = () => {
         setSearchTerm("");
     };
-
+    const [showImages, setShowImages] = useState(false);
+    const handleShowImages = () => {
+        setShowImages(true);
+    };
+    const [selectedProductImage, setSelectedProductImage] = useState('');
+    // Thêm một hàm để xử lý sự kiện khi sản phẩm được bấm vào
+    const handleProductClick = (imageUrls) => {
+        setSelectedProductImages(imageUrls);
+    };
     const columns = [
         {
             title: 'STT',
@@ -143,9 +151,7 @@ const AdminProduct = () => {
             key: 'courseIMG',
             render: (courseIMG: string[]) => (
                 <>
-                    {courseIMG.map((imageUrl, index) => (
-                        <Image key={index} width={120} src={imageUrl} alt={`Hình ảnh ${index + 1}`} />
-                    ))}
+                    <Button onClick={() => handleProductClick(courseIMG)}>Hiển thị hình ảnh</Button>
                 </>
             ),
         },
@@ -259,10 +265,21 @@ const AdminProduct = () => {
         }
     };
 
-  
+    const [selectedProductImages, setSelectedProductImages] = useState([]);
 
     return (
         <div>
+
+<Modal
+    title="Hình ảnh sản phẩm"
+    visible={selectedProductImages.length > 0}
+    onCancel={() => setSelectedProductImages([])}
+    footer={null}
+>
+    {selectedProductImages.map((imageUrl, index) => (
+        <Image key={index} width={200} src={imageUrl} alt={`Hình ảnh sản phẩm ${index + 1}`} />
+    ))}
+</Modal>
             <Modal
                 title={`Danh sách người mua sản phẩm !`}
                 visible={isVideosModalVisible}
