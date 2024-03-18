@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Button, Table, Skeleton, Popconfirm, message, Pagination, Modal, Input } from 'antd';
-import { Link, Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { formatCurrency } from '@/components/FormatCurency/formatCurency';
-import { useGetVideosQuery, useRemoveVideoMutation } from "@/api/video";
+import {  useRemoveVideoMutation } from "@/api/video";
 import { Image } from 'antd';
 
 const AdminProduct = () => {
@@ -19,32 +19,13 @@ const AdminProduct = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const showFullDescription = (courseID: any) => {
         const selectedCourse = productsData.find((product: any) => product.id === courseID);
-
         let isFullDescriptionVisible = true;
-
-        // const toggleDescription = () => {
-        //     isFullDescriptionVisible = !isFullDescriptionVisible;
-        // };
 
         const modalContent = (
             <div>
                 <p>Chất liệu: {selectedCourse.chatlieu}</p>
                 <p>Mô tả: {isFullDescriptionVisible ? selectedCourse.description : selectedCourse.description.slice(0, 100) + '...'}</p>
                 <p>ID: {selectedCourse.id}</p>
-                {/* {selectedCourse.description.length > 100 && (
-                    <Button type="link" onClick={toggleDescription}>
-                        {isFullDescriptionVisible ? 'Rút gọn' : 'Xem thêm'}
-                    </Button>
-                )} */}
-                {/* <ul>
-                    {selectedCourseVideos.map((video: any, index: any) => (
-                        <li key={index}>
-                            <a href={video.videoURL} target="_blank" rel="noopener noreferrer">
-                                {video.videoTitle}
-                            </a>
-                        </li>
-                    ))}
-                </ul> */}
             </div>
         );
         Modal.info({
@@ -58,10 +39,6 @@ const AdminProduct = () => {
                 },
             },
         });
-    };
-
-    const toggleDescription = (courseID) => {
-        setShowFullDescription(showFullDescription === courseID ? null : courseID);
     };
 
     const handlePageChange = (page: any) => {
@@ -109,10 +86,6 @@ const AdminProduct = () => {
     }, [searchTerm]);
     const handleResetSearch = () => {
         setSearchTerm("");
-    };
-    const handleButtonClick = (recordId: any) => {
-        const quizURL = `/adminnonelayout/quiz/${recordId}`;
-        window.open(quizURL, '_blank');
     };
 
     const columns = [
@@ -169,28 +142,13 @@ const AdminProduct = () => {
             dataIndex: 'courseIMG',
             key: 'courseIMG',
             render: (courseIMG: string[]) => (
-                <Image width={120} src={courseIMG[0]} alt="Hình ảnh" />
+                <>
+                    {courseIMG.map((imageUrl, index) => (
+                        <Image key={index} width={120} src={imageUrl} alt={`Hình ảnh ${index + 1}`} />
+                    ))}
+                </>
             ),
         },
-        // {
-        //     title: 'Tính năng',
-        //     dataIndex: 'Quiz',
-        //     key: 'Quiz',
-        //     width: '200px',
-        //     render: (text: any, record: any, id: any) => (
-        //         <div className="flex items-center gap-2">
-        //             <Button type='default' className='bg-gray-100' onClick={() => handleButtonClick(record.id)}>
-        //                 Quiz
-        //             </Button>
-        //             <Button
-        //                 type="default"
-        //                 onClick={() => window.open(`/admin/video/add/${record.id}`, '_blank')}
-        //             >
-        //                 Thêm Video
-        //             </Button>
-        //         </div>
-        //     ),
-        // },
         {
             title: 'Trạng thái',
             dataIndex: 'isHidden',
@@ -255,27 +213,13 @@ const AdminProduct = () => {
     /////////////////////////////////////////////////////////////////
 
 
-
-    const [removeCategory, { isLoading: isRemoveLoading }] = useRemoveVideoMutation();
     const [deleteVideoId, setDeleteVideoId] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [coursesData, setCoursesData] = useState([]);
     const [coursesData2, setCoursesData2] = useState([]);
     const [selectedCourseId, setSelectedCourseId] = useState(null);
-    const handleCourseIdChange = (event) => {
-        setSelectedCourseId(event.target.value);
-    };
 
-    const dataSource = productsData
-        ?.filter((item: Ivideo) => selectedCourseId ? item.courseId === selectedCourseId : true)
-        .map((item: Ivideo, index: number) => ({
-            stt: (index + 1).toString(),
-            key: item.id,
-            videoTitle: item.videoTitle,
-            courseName: coursesData[item.courseId] || "Unknown Course", // Look up courseName
-            videoURL: item.videoURL,
-        }));
-    console.log(coursesData);
+
 
     useEffect(() => {
         fetch('http://localhost:3000/Courses')
@@ -314,80 +258,8 @@ const AdminProduct = () => {
             setIsModalVisible(true);
         }
     };
-    const fetchVideoDataById = async (videoId) => {
-        try {
-            const response = await axios.get(`http://localhost:3000/videos/${videoId}`);
-            return response.data;
 
-
-        } catch (error) {
-            console.error('Error fetching video data:', error);
-            throw error; // Rethrow the error to handle it at a higher level
-        }
-    };
-
-    const handleVideoDelete = async () => {
-        if (deleteVideoId) {
-            try {
-                // Sử dụng giá trị trả về từ fetchVideoDataById
-                const videoData = await fetchVideoDataById(deleteVideoId);
-                console.log('Video Data from API:', videoData);
-
-                const courseIdToDelete = videoData?.courseId;
-                const videoDuration = videoData?.duration || 0;
-
-                // Lấy thông tin về khóa học từ danh sách coursesData2
-                const courseToDelete = coursesData2.find((course) => course.id === courseIdToDelete);
-                const initialCourseDuration = courseToDelete?.duration || 0;
-
-                console.log("Before deletion:");
-                console.log("Initial Course Duration:", initialCourseDuration);
-                console.log("Video Duration:", videoDuration);
-
-                // Kiểm tra giá trị trả về từ removeCategory
-                await removeCategory(deleteVideoId);
-
-                // Kiểm tra xem coursesData2 có phải là mảng không trước khi sử dụng map
-                if (Array.isArray(coursesData2)) {
-                    const updatedCourses = coursesData2.map((course) => {
-                        if (course.id === courseIdToDelete) {
-                            // Trừ thời lượng của video bị xóa khỏi thời lượng của khóa học
-                            course.duration = Math.max(0, course.duration - videoDuration);
-                        }
-                        return course;
-                    });
-
-                    console.log("After deletion:");
-                    console.log("Updated Courses:", updatedCourses);
-
-                    const updateCoursePromises = updatedCourses.map((updatedCourse) => {
-                        return fetch(`http://localhost:3000/Courses/${updatedCourse.id}`, {
-                            method: "PUT",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(updatedCourse),
-                        });
-                    });
-
-                    setIsModalVisible(false);
-                    setDeleteVideoId(null);
-
-                    await Promise.all(updateCoursePromises);
-                    messageApi.open({
-                        type: "success",
-                        content: "Đã xóa thành công!",
-                    });
-                    setIsVideosModalVisible(false);
-                } else {
-                    console.error("coursesData2 không phải là một mảng.");
-                }
-            } catch (error) {
-                setIsModalVisible(false);
-                console.error("Lỗi khi xóa video hoặc cập nhật khóa học:", error);
-            }
-        }
-    };
+  
 
     return (
         <div>
