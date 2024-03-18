@@ -35,7 +35,7 @@ const Signuinadmin = () => {
             setCookie('role', userRole);
             message.success('Đăng nhập thành công bạn sẽ được chuyển tới trang chủ');
             setTimeout(() => {
-                navigate('/')
+                navigate('/admin')
             }, 2000);
 
         } catch (error: any) {
@@ -84,19 +84,19 @@ const Signuinadmin = () => {
                                 .then((response) => {
                                     console.log('User information sent to API:', response.data);
                                     localStorage.setItem('uid', firebaseUserId);
-                                     navigate('/')
+                                    navigate('/admin')
                                 })
                                 .catch((error) => {
                                     console.error('Error sending user information to API:', error);
                                     alert('Không thành công');
                                 });
                         } else {
-                           
+
                             // User exists, check if the account is locked
                             const existingUser = response.data[0];
                             const role = response.data[0].role
                             console.log(role, 'dea');
-                            
+
                             if (existingUser.lock) {
                                 console.log('User is locked:', user.email);
                                 alert('Không thể đăng nhập. Tài khoản của bạn đã bị khóa.');
@@ -106,7 +106,7 @@ const Signuinadmin = () => {
                                 console.log('User logged in successfully:', user.email);
                                 localStorage.setItem('uid', firebaseUserId);
                                 console.log('Role Cookie:', roleCookie);
-                                 navigate('/');
+                                navigate('/admin');
                             }
                         }
                     })
@@ -172,7 +172,7 @@ const Signuinadmin = () => {
                     </button>
 
                     <br />
-                 
+
                 </div>
                 <div className='login-footer'>
                     <ul>
