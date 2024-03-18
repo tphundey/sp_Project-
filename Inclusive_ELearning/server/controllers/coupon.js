@@ -5,9 +5,16 @@ const mongoose = require('mongoose');
 const Coupons = require("../models/coupon");
 const routerCoupon = express.Router();
 
-// Create
 routerCoupon.post("/", async (req, res) => {
   try {
+    // Kiểm tra xem mã giảm giá đã tồn tại chưa
+    const existingCoupon = await Coupons.findOne({ code: req.body.code });
+
+    if (existingCoupon) {
+      return res.status(400).json({ error: "Mã giảm giá đã tồn tại" });
+    }
+
+    // Nếu mã chưa tồn tại, tạo mới
     const newCourse = await Coupons.create(req.body);
     return res.status(201).json(newCourse);
   } catch (error) {
